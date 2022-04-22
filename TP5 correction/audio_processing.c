@@ -28,20 +28,16 @@ static float micBack_output[FFT_SIZE];
 #define MIN_VALUE_THRESHOLD	10000 
 
 #define MIN_FREQ		10	//we don't analyze before this index to not use resources for nothing
-#define FREQ_FORWARD	16	//250Hz
-#define FREQ_LEFT		19	//296Hz
-#define FREQ_RIGHT		23	//359HZ
-#define FREQ_BACKWARD	26	//406Hz
-#define MAX_FREQ		30	//we don't analyze after this index to not use resources for nothing
+#define FREQ_RIGHT	 	12.81	//200Hz
+#define FREQ_LEFT	  	38.43	//600Hz
+#define MAX_FREQ		55	//we don't analyze after this index to not use resources for nothing
 
-#define FREQ_FORWARD_L		(FREQ_FORWARD-1)
-#define FREQ_FORWARD_H		(FREQ_FORWARD+1)
-#define FREQ_LEFT_L			(FREQ_LEFT-1)
-#define FREQ_LEFT_H			(FREQ_LEFT+1)
-#define FREQ_RIGHT_L		(FREQ_RIGHT-1)
-#define FREQ_RIGHT_H		(FREQ_RIGHT+1)
-#define FREQ_BACKWARD_L		(FREQ_BACKWARD-1)
-#define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
+#define FREQ_LEFT_L			(FREQ_LEFT-3)
+#define FREQ_LEFT_H			(FREQ_LEFT+3)
+#define FREQ_RIGHT_L		(FREQ_RIGHT-3)
+#define FREQ_RIGHT_H		(FREQ_RIGHT+3)
+
+#define SPEED				600
 
 /*
 *	Simple function used to detect the highest value in a buffer
@@ -59,29 +55,19 @@ void sound_remote(float* data){
 		}
 	}
 
-	//go forward
-	if(max_norm_index >= FREQ_FORWARD_L && max_norm_index <= FREQ_FORWARD_H){
-		left_motor_set_speed(600);
-		right_motor_set_speed(600);
-	}
 	//turn left
 	else if(max_norm_index >= FREQ_LEFT_L && max_norm_index <= FREQ_LEFT_H){
-		left_motor_set_speed(-600);
-		right_motor_set_speed(600);
+		left_motor_set_speed(-SPEED);
+		right_motor_set_speed(SPEED);
 	}
 	//turn right
 	else if(max_norm_index >= FREQ_RIGHT_L && max_norm_index <= FREQ_RIGHT_H){
-		left_motor_set_speed(600);
-		right_motor_set_speed(-600);
-	}
-	//go backward
-	else if(max_norm_index >= FREQ_BACKWARD_L && max_norm_index <= FREQ_BACKWARD_H){
-		left_motor_set_speed(-600);
-		right_motor_set_speed(-600);
+		left_motor_set_speed(SPEED);
+		right_motor_set_speed(-SPEED);
 	}
 	else{
-		left_motor_set_speed(0);
-		right_motor_set_speed(0);
+		left_motor_set_speed(SPEED);
+		right_motor_set_speed(SPEED);
 	}
 	
 }
