@@ -4,6 +4,7 @@
 #include <usbcfg.h>
 #include <chprintf.h>
 
+#include <create_path.h>
 #include <motors.h>
 #include <audio/microphone.h>
 #include <audio_processing.h>
@@ -37,8 +38,6 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_RIGHT_L		(FREQ_RIGHT-3)
 #define FREQ_RIGHT_H		(FREQ_RIGHT+3)
 
-#define SPEED			600
-
 /*
 *	Simple function used to detect the highest value in a buffer
 *	and to execute a motor command depending on it
@@ -55,21 +54,7 @@ void sound_remote(float* data){
 		}
 	}
 
-	//turn left
-	else if(max_norm_index >= FREQ_LEFT_L && max_norm_index <= FREQ_LEFT_H){
-		left_motor_set_speed(-SPEED);
-		right_motor_set_speed(SPEED);
-	}
-	//turn right
-	else if(max_norm_index >= FREQ_RIGHT_L && max_norm_index <= FREQ_RIGHT_H){
-		left_motor_set_speed(SPEED);
-		right_motor_set_speed(-SPEED);
-	}
-	else{
-		left_motor_set_speed(SPEED);
-		right_motor_set_speed(SPEED);
-	}
-	
+	init_path(max_norm_index);
 }
 
 /*
