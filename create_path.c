@@ -38,4 +38,11 @@ void process_path(int16_t index) {
 	else if(index >= FREQ_RIGHT_L && index <= FREQ_RIGHT_H){
 		left_motor_set_speed(SPEED);
 		right_motor_set_speed(-SPEED);
+	}
+	//is a line found?
+	else if(get_pathFound()) {
+		left_motor_set_speed(-SPEED);
+		right_motor_set_speed(SPEED);
+		//turn around 180 degrees?
+	}
 }

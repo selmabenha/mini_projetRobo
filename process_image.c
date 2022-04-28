@@ -151,9 +151,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 		//search for a line in the image
 		if(extract_line_width(image)){
-			pathFound = true;
+			set_pathFound(true);
 		} else {
-			pathFound = false;
+			set_pathFound(false);
 		}
 
 		if(send_to_computer){
@@ -176,4 +176,11 @@ uint16_t get_line_position(void){
 void process_image_start(void){
 	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
+}
+
+bool get_pathFound(void) {
+	return pathFound;
+}
+void set_pathFound(bool path) {
+	pathFound = path;
 }
