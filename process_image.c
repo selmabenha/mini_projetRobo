@@ -8,7 +8,7 @@
 
 #include <process_image.h>
 
-
+static bool pathFound = 0;
 static float distance_cm = 0;
 static uint16_t line_position = IMAGE_BUFFER_SIZE/2;	//middle
 
@@ -19,7 +19,7 @@ static BSEMAPHORE_DECL(image_ready_sem, TRUE);
  *  Returns the line's width extracted from the image buffer given
  *  Returns 0 if line not found
  */
-uint16_t extract_line_width(uint8_t *buffer){
+bool extract_line_width(uint8_t *buffer){
 
 	uint16_t i = 0, begin = 0, end = 0, width = 0;
 	uint8_t stop = 0, wrong_line = 0, line_not_found = 0;
@@ -93,9 +93,11 @@ uint16_t extract_line_width(uint8_t *buffer){
 
 	//sets a maximum width or returns the measured width
 	if((PXTOCM/width) > MAX_DISTANCE){
-		return PXTOCM/MAX_DISTANCE;
-	}else{
-		return width;
+		return false;
+	}else if(width == 0){
+		return false;
+	} else {
+		return true;
 	}
 }
 
@@ -147,12 +149,11 @@ static THD_FUNCTION(ProcessImage, arg) {
 			image[i/2] = (uint8_t)img_buff_ptr[i]&0xF8;
 		}
 
-		//search for a line in the image and gets its width in pixels
-		lineWidth = extract_line_width(image);
-
-		//converts the width into a distance between the robot and the camera
-		if(lineWidth){
-			distance_cm = PXTOCM/lineWidth;
+		//search for a line in the image
+		if(extract_line_width(image)){
+			pathFound = true;
+		} else {
+			pathFound = false;
 		}
 
 		if(send_to_computer){
