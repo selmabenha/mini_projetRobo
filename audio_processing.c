@@ -38,6 +38,8 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_RIGHT_L		(FREQ_RIGHT-3)
 #define FREQ_RIGHT_H		(FREQ_RIGHT+3)
 
+static int16_t max_norm_index;
+
 /*
 *	Simple function used to detect the highest value in a buffer
 *	and to execute a motor command depending on it
@@ -54,7 +56,6 @@ void sound_remote(float* data){
 		}
 	}
 
-	init_path(max_norm_index);
 }
 
 /*
@@ -172,4 +173,11 @@ float* get_audio_buffer_ptr(BUFFER_NAME_t name){
 	else{
 		return NULL;
 	}
+}
+
+int16_t get_max_norm_index(void) {
+	return max_norm_index;
+}
+void set_max_norm_index(int16_t index) {
+	max_norm_index = index;
 }

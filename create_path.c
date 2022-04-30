@@ -10,12 +10,25 @@
 #include <create_path.h>
 #include <process_image.h>
 
-static bool freeze = 0;
+static THD_WORKING_AREA(theControlMovement, 256);
+static THD_FUNCTION(ControlMovement, arg) {
+
+	chRegSetThreadName(__FUNCTION__);
+	(void)arg;
+
+	systime_t time;
+
+	while(!get_pathFound()) {
+		time = chVTGetSystemTime();
+
+		init_path(get_max_norm_index());
+	}
+}
 
 //decides whether the motors stop or go depending on information from the TOF sensor
 void init_path(int16_t index) {
 
-	if(freeze){
+	if(get_freeze()){
 		motors_stop();
 		process_path(index);
 	} else {

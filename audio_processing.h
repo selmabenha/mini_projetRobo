@@ -30,4 +30,8 @@ void wait_send_to_computer(void);
 */
 float* get_audio_buffer_ptr(BUFFER_NAME_t name);
 
+//setter and getter for static variable
+int16_t get_max_norm_index(void);
+void set_max_norm_index(int16_t index);
+
 #endif /* AUDIO_PROCESSING_H */
