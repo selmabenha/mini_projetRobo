@@ -1,3 +1,10 @@
+/*
+ * detect_color.c
+ *
+ *  Created on: Apr 30, 2022
+ *      Author: mehdiamor
+ */
+
 #include "ch.h"
 #include "hal.h"
 #include <chprintf.h>
@@ -108,7 +115,7 @@ static THD_FUNCTION(ProcessImage, arg) {
     while(1){
     	//waits until an image has been captured
         chBSemWait(&image_ready_sem);
-		//gets the pointer to the array filled with the last image in RGB565    
+		//gets the pointer to the array filled with the last image in RGB565
 		img_buff_ptr = dcmi_get_last_image_ptr();
 
 		//Extracts only the red pixels
