@@ -25,6 +25,14 @@ static THD_FUNCTION(ControlMovement, arg) {
 	}
 }
 
+void control_mov_start(void) {
+	chThdCreateStatic(theControlMovement, sizeof(theControlMovement), NORMALPRIO, ControlMovement, NULL);
+}
+
+void control_mov_end(void) {
+	chThdTerminate(theControlMovement);
+}
+
 //decides whether the motors stop or go depending on information from the TOF sensor
 void init_path(int16_t index) {
 
@@ -51,5 +59,13 @@ void process_path(int16_t index) {
 	else if(get_pathFound()) {
 		motors_turn_left();
 		//turn around 180 degrees?
+	}
+}
+
+void time_path(void) {
+	if(!get_pathFound() && !chVTIsSystemTimeWithinX(0, 10000)) {
+		set_led(8,1);
+		motors_stop();
+		set_pathFound(true);
 	}
 }
