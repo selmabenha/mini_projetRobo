@@ -37,29 +37,40 @@ static void serial_start(void)
 int main(void)
 {
 
-    halInit();
-    chSysInit();
-    mpu_init();
+	halInit();
+	chSysInit();
+	mpu_init();
 
-    //starts the serial communication
-    serial_start();
-    //start the USB communication
-    usb_start();
-    //starts the camera
-    dcmi_start();
-	po8030_start();
+	//initializes melody
+	playMelodyStart();
+
+	//starts the serial communication
+	serial_start();
+	//starts the USB communication
+	usb_start();
 	//inits the motors
 	motors_init();
+	//starts the TOF sensors
+	VL53L0X_start();
+	//start the TOF thread
+	start_tof();
 
-	//stars the threads for the pi regulator and the processing of the image
-	pi_regulator_start();
-	process_image_start();
+	//starts the camera
+	dcmi_start();
+	po8030_start();
+	po8030_set_awb(0);
+	//starts the threads for the processing of the image
+	detect_color_start();
+	dac_start();
 
-    /* Infinite loop. */
-    while (1) {
-    	//waits 1 second
-        chThdSleepMilliseconds(1000);
-    }
+	//starts the threads for the control of the motors and audio processing
+	control_mov_start();
+	control_audio_start();
+
+	/* Infinite loop. */
+	while (1) {
+		wait_send_to_computer();
+	}
 }
 
 #define STACK_CHK_GUARD 0xe2dee396
