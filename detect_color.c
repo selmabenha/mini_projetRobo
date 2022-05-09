@@ -107,7 +107,9 @@ static THD_FUNCTION(ProcessImage, arg) {
     (void)arg;
 
 	uint8_t *img_buff_ptr;
-	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
+	uint8_t red_image[IMAGE_BUFFER_SIZE] = {0};
+	uint8_t green_image[IMAGE_BUFFER_SIZE] = {0};
+	uint8_t blue_image[IMAGE_BUFFER_SIZE] = {0};
 	uint16_t lineWidth = 0;
 
 	bool send_to_computer = true;
@@ -122,11 +124,18 @@ static THD_FUNCTION(ProcessImage, arg) {
 		for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
 			//extracts first 5bits of the first byte
 			//takes nothing from the second byte
-			image[i/2] = (uint8_t)img_buff_ptr[i]&0xF8;
+			//extracts only red
+			red_image[i/2] = (uint8_t)img_buff_ptr[i]&0xF8;
+
+			//extracts green
+			green_image[i/2] = ((uint8_t)((img_buff_ptr[i]&(0x07)<<3)+ ((uint8_t)img_buff_ptr[i + 1]&(0xE0)>>5))); //green
+
+			//extracts blue
+			blue_image[i/2] = (uint8_t)(img_buff_ptr[i + 1]&0x1F);
 		}
 
 		//search for a line in the image
-		if(verify_line_color(image)){
+		if(verify_line_color(red_image)){
 			set_pathFound(true);
 		} else {
 			set_pathFound(false);
