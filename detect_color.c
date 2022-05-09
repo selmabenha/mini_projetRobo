@@ -12,12 +12,23 @@
 
 #include <main.h>
 #include <camera/po8030.h>
+#include <motors_pro.h>
+#include <detect_color.h>
+#include <audio/audio_thread.h>
+#include <audio/play_melody.h>
 
-#include <process_image.h>
+#define IMAGE_BUFFER_SIZE		640
+#define WIDTH_SLOPE				10
+#define MIN_LINE_WIDTH			50
+#define PXTOCM					1570.0f //experimental value
+#define GOAL_DISTANCE 			10.0f
+#define MAX_DISTANCE 			25.0f
+#define DETECT_NUM				2
+#define BLUE_FILTER				0xF0
+#define RED_FILTER				0x1E
 
 static bool pathFound = 0;
-static float distance_cm = 0;
-static uint16_t line_position = IMAGE_BUFFER_SIZE/2;	//middle
+static bool impasseFound = 0;
 
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
@@ -107,10 +118,9 @@ static THD_FUNCTION(ProcessImage, arg) {
     (void)arg;
 
 	uint8_t *img_buff_ptr;
-	uint8_t red_image[IMAGE_BUFFER_SIZE] = {0};
-	uint8_t green_image[IMAGE_BUFFER_SIZE] = {0};
-	uint8_t blue_image[IMAGE_BUFFER_SIZE] = {0};
-	uint16_t lineWidth = 0;
+	bool red_lineCheck[DETECT_NUM] = {0};
+	bool blue_lineCheck[DETECT_NUM] = {0};
+	set_pathFound(0);
 
 	bool send_to_computer = true;
 

@@ -58,3 +58,13 @@ void motors_init_pos(void) {
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
 }
+
+void motors_u_turn(void) {
+	motors_turn_right();
+	motors_turn_right();
+}
+
+void motors_spin(void) {
+	motors_u_turn();
+	motors_u_turn();
+}

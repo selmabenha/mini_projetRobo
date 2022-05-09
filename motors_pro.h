@@ -19,5 +19,7 @@ void motors_go(void);
 void motors_stop(void);
 void motors_turn_right(void);
 void motors_turn_left(void);
+void motors_u_turn(void);
+void motors_spin(void);
 
 #endif /* MOTORS_PRO_H_ */
