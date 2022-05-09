@@ -76,7 +76,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	*	1024 samples, then we compute the FFTs.
 	*
 	*/
-
+	waitDetectStart();
 	static uint16_t nb_samples = 0;
 	static uint8_t mustSend = 0;
 

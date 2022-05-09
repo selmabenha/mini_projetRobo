@@ -20,7 +20,7 @@ static THD_FUNCTION(ControlMovement, arg) {
 
 	while(!get_pathFound()) {
 		time = chVTGetSystemTime();
-
+		waitDetectStart();
 		init_path(get_max_norm_index());
 	}
 }
@@ -39,6 +39,10 @@ void init_path(int16_t index) {
 	if(get_freeze()){
 		motors_stop();
 		process_path(index);
+	} else if(get_pathFound()){
+		motors_turn_right();
+		motors_turn_right();
+		motors_go();
 	} else {
 		motors_go();
 	}
