@@ -14,6 +14,7 @@
 
 #define MOTOR_SPEED_LIMIT 1100 // [step/s]
 
+void motors_init_pos(void);
 void motors_go(void);
 void motors_stop(void);
 void motors_turn_right(void);
