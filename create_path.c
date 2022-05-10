@@ -67,9 +67,31 @@ void process_path(int16_t index) {
 }
 
 void time_path(void) {
-	if(!get_pathFound() && !chVTIsSystemTimeWithinX(0, 10000)) {
-		set_led(8,1);
-		motors_stop();
-		set_pathFound(true);
+	if(!get_pathFound()) {
+		if(!chVTIsSystemTimeWithinX(0, GAME_OVER_TIME) && game_over == 0) {
+			set_led(1,1);
+			playNote(NOTE_C5, WARN_TIME);
+			game_over++;
+		}
+		if(!chVTIsSystemTimeWithinX(0, GAME_OVER_TIME*2) && game_over == 1) {
+			set_led(3,1);
+			playNote(NOTE_C5, WARN_TIME);
+			game_over++;
+		}
+		if(!chVTIsSystemTimeWithinX(0, GAME_OVER_TIME*3) && game_over == 2) {
+			set_led(5,1);
+			playNote(NOTE_C5, WARN_TIME);
+			game_over++;
+		}
+		if(!chVTIsSystemTimeWithinX(0, GAME_OVER_TIME*4) && game_over == 3) {
+			set_led(8,1);
+			playMelody(MARIO_DEATH, 0, ML_FORCE_CHANGE);
+			motors_stop();
+			waitMelodyHasFinished();
+			return true;
+		}
+		return false;
 	}
+	clear_leds();
+	return false;
 }
