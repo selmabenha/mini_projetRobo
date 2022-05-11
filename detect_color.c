@@ -124,40 +124,24 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 	bool send_to_computer = true;
 
-    while(1){
-    	//waits until an image has been captured
-        chBSemWait(&image_ready_sem);
-		//gets the pointer to the array filled with the last image in RGB565
-		img_buff_ptr = dcmi_get_last_image_ptr();
+	while(1){
 
-		//Extracts only the red pixels
-		for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
-			//extracts first 5bits of the first byte
-			//takes nothing from the second byte
-			//extracts only red
-			red_image[i/2] = (uint8_t)img_buff_ptr[i]&0xF8;
+			//detection process is verified in an array of size DETECT_NUM to help eliminate noise
+	    	for(int i = 0; i < DETECT_NUM; i++) {
+	    		//waits until an image has been captured
+	    		chBSemWait(&image_ready_sem);
+	    		//gets the pointer to the array filled with the last image in RGB565
+	    		img_buff_ptr = dcmi_get_last_image_ptr();
 
-			//extracts green
-			green_image[i/2] = ((uint8_t)((img_buff_ptr[i]&(0x07)<<3)+ ((uint8_t)img_buff_ptr[i + 1]&(0xE0)>>5))); //green
+	    		//filters the image into the blue and red tables
+	    		filter_image(img_buff_ptr);
 
-			//extracts blue
-			blue_image[i/2] = (uint8_t)(img_buff_ptr[i + 1]&0x1F);
-		}
+	    		//search for a line in the image
+	    		red_lineCheck[i] = verify_line_color(red_image);
+	    		blue_lineCheck[i] = verify_line_color(blue_image);
+	    	}
 
-		//search for a line in the image
-		if(verify_line_color(red_image)){
-			set_pathFound(true);
-		} else {
-			set_pathFound(false);
-		}
-
-		if(send_to_computer){
-			//sends to the computer the image
-			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-		}
-		//invert the bool
-		send_to_computer = !send_to_computer;
-    }
+	   	}
 }
 
 uint16_t get_line_position(void){
