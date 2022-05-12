@@ -39,10 +39,6 @@ void init_path(int16_t index) {
 	if(get_freeze()){
 		motors_stop();
 		process_path(index);
-	} else if(get_pathFound()){
-		motors_turn_right();
-		motors_turn_right();
-		motors_go();
 	} else {
 		motors_go();
 	}
@@ -61,8 +57,7 @@ void process_path(int16_t index) {
 	}
 	//is a line found?
 	else if(get_pathFound()) {
-		motors_turn_left();
-		//turn around 180 degrees?
+		motors_spin();
 	}
 }
 

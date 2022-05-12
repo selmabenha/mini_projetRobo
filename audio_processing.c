@@ -30,8 +30,6 @@ static float micBack_output[FFT_SIZE];
 
 #define MIN_FREQ		12	//we don't analyze before this index to not use resources for nothing , 200Hz
 #define MAX_FREQ		55 //we don't analyze after this index to not use resources for nothing, 858Hz
-#define FREQ_LEFT		19	//296Hz
-#define FREQ_RIGHT		23	//359HZ
 
 #define FREQ_LEFT_L			(FREQ_LEFT-3)
 #define FREQ_LEFT_H			(FREQ_LEFT+3)
@@ -39,6 +37,11 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_RIGHT_H		(FREQ_RIGHT+3)
 
 static int16_t max_norm_index;
+
+static THD_WORKING_AREA(theControlAudio, 256);
+static THD_FUNCTION(ControlAudio, arg) {
+
+}
 
 /*
 *	Simple function used to detect the highest value in a buffer

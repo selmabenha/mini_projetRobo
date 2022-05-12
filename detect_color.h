@@ -8,8 +8,6 @@
 #ifndef DETECT_COLOR_H_
 #define DETECT_COLOR_H_
 
-
-uint16_t get_line_position(void);
 void process_image_start(void);
 bool verify_line_color(uint8_t *buffer);
 
