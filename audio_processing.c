@@ -41,6 +41,22 @@ static int16_t max_norm_index;
 static THD_WORKING_AREA(theControlAudio, 256);
 static THD_FUNCTION(ControlAudio, arg) {
 
+    chRegSetThreadName(_FUNCTION_);
+    (void)arg;
+
+    systime_t time;
+
+    while(1) {
+    	time = chVTGetSystemTime();
+
+        //starts the microphones processing thread.
+        //it calls the callback given in parameter when samples are ready
+    	wait_detectStart();
+    	mic_start(&processAudioData);
+
+    	//100Hz
+    	chThdSleepUntilWindowed(time, time + MS2ST(10));
+    }
 }
 
 /*
