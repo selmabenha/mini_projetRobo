@@ -141,6 +141,22 @@ static THD_FUNCTION(ProcessImage, arg) {
 			blue_lineCheck[i] = verify_line_color(blue_image);
 		}
 
+		//finalizes the detection of the red or blue line so that they can be read from the ControlMovement thread
+		if(send_to_computer){
+			if(read_table(blue_lineCheck)) {
+				set_pathFound(true);
+			}
+			if(read_table(red_lineCheck)) {
+				set_impasseFound(true);
+			}
+		}
+		//invert the bool and reinitialize
+		send_to_computer = !send_to_computer;
+		for(int i = 0; i < DETECT_NUM; i++) {
+			red_lineCheck[i] = 0;
+			blue_lineCheck[i] = 0;
+		}
+
 	}
 }
 
