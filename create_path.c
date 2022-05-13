@@ -1,14 +1,25 @@
+/*
+ * return_path.c
+ *
+ *  Created on: May 5, 2022
+ *      Author: selmabenhassine
+ */
+
+#include <create_path.h>
+
 #include "ch.h"
 #include "hal.h"
-#include <math.h>
+#include <main.h>
 #include <usbcfg.h>
 #include <chprintf.h>
 
-
-#include <main.h>
+#include <leds.h>
+#include <audio/play_melody.h>
+#include <audio_processing.h>
+#include <detect_color.h>
+#include <tof.h>
 #include <motors_pro.h>
-#include <create_path.h>
-#include <process_image.h>
+#include <arm_math.h>
 
 static THD_WORKING_AREA(theControlMovement, 256);
 static THD_FUNCTION(ControlMovement, arg) {
@@ -58,6 +69,8 @@ void process_path(int16_t index) {
 	//is a line found?
 	else if(get_pathFound()) {
 		motors_spin();
+	} else if(get_impasseFound()) {
+		motors_u_turn();
 	}
 }
 

@@ -126,22 +126,22 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 	while(1){
 
-			//detection process is verified in an array of size DETECT_NUM to help eliminate noise
-	    	for(int i = 0; i < DETECT_NUM; i++) {
-	    		//waits until an image has been captured
-	    		chBSemWait(&image_ready_sem);
-	    		//gets the pointer to the array filled with the last image in RGB565
-	    		img_buff_ptr = dcmi_get_last_image_ptr();
+		//detection process is verified in an array of size DETECT_NUM to help eliminate noise
+		for(int i = 0; i < DETECT_NUM; i++) {
+			//waits until an image has been captured
+			chBSemWait(&image_ready_sem);
+			//gets the pointer to the array filled with the last image in RGB565
+			img_buff_ptr = dcmi_get_last_image_ptr();
 
-	    		//filters the image into the blue and red tables
-	    		filter_image(img_buff_ptr);
+			//filters the image into the blue and red tables
+			filter_image(img_buff_ptr);
 
-	    		//search for a line in the image
-	    		red_lineCheck[i] = verify_line_color(red_image);
-	    		blue_lineCheck[i] = verify_line_color(blue_image);
-	    	}
+			//search for a line in the image
+			red_lineCheck[i] = verify_line_color(red_image);
+			blue_lineCheck[i] = verify_line_color(blue_image);
+		}
 
-	   	}
+	}
 }
 
 void process_image_start(void){
