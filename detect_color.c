@@ -160,6 +160,25 @@ static THD_FUNCTION(ProcessImage, arg) {
 	}
 }
 
+void filter_image(uint8_t *img_ptr) {
+	for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
+		//Extracts only the red pixels - fills the blue table
+		blue_image[i/2] = (uint8_t)img_ptr[i]&BLUE_FILTER;
+
+		//Extracts only the blue pixels - fills the red table
+		red_image[i/2] = (uint8_t)(img_ptr[i + 1]&RED_FILTER);
+	}
+}
+
+bool read_table(bool table[]) {
+	for(uint8_t i = 0; i < DETECT_NUM; i++) {
+		if(!table[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
 void process_image_start(void){
 	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);

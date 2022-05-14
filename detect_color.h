@@ -14,4 +14,8 @@ bool verify_line_color(uint8_t *buffer);
 bool get_pathFound(void);
 void set_pathFound(bool path);
 
+void filter_image(uint8_t *img_ptr);
+
+bool read_table(bool table[]);
+
 #endif /* DETECT_COLOR_H */
