@@ -9,7 +9,7 @@
 #define DETECT_COLOR_H_
 
 void process_image_start(void);
-bool verify_line_color(uint8_t *buffer);
+bool verify_line_color(uint8_t *buffer, uint16_t width, uint16_t slope);
 
 bool get_pathFound(void);
 void set_pathFound(bool path);

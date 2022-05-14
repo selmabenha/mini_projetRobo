@@ -18,14 +18,19 @@
 #include <audio/play_melody.h>
 
 #define IMAGE_BUFFER_SIZE		640
-#define WIDTH_SLOPE				10
-#define MIN_LINE_WIDTH			50
+#define WIDTH_SLOPE_RED				500 //experimental value
+#define MIN_LINE_WIDTH_RED			200 //experimental value
+#define WIDTH_SLOPE_GREEN				500 //experimental value
+#define MIN_LINE_WIDTH_GREEN			200 //experimental value
+#define WIDTH_SLOPE_BLUE				500 //experimental value
+#define MIN_LINE_WIDTH_BLUE			200 //experimental value
+
 #define PXTOCM					1570.0f //experimental value
 #define GOAL_DISTANCE 			10.0f
 #define MAX_DISTANCE 			25.0f
-#define DETECT_NUM				2
-#define BLUE_FILTER				0xF0
-#define RED_FILTER				0x1E
+#define DETECT_NUM				5    //experimental value
+#define BLUE_FILTER				0xF0 //experimental value //0xF0
+#define RED_FILTER				0x1E //experimental value //0x1F
 
 static bool pathFound = 0;
 static bool impasseFound = 0;
@@ -37,7 +42,7 @@ static BSEMAPHORE_DECL(image_ready_sem, TRUE);
  *  Returns the line's width extracted from the image buffer given
  *  Returns 0 if line not found
  */
-bool verify_line_color(uint8_t *buffer) {
+bool verify_line_color(uint8_t *buffer, uint16_t width, uint16_t slope) {
 	uint16_t i = 0, begin = 0, end = 0;
 	uint8_t stop = 0;
 	uint32_t mean = 0;
@@ -143,14 +148,8 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 		//finalizes the detection of the red or blue line so that they can be read from the ControlMovement thread
 		if(send_to_computer){
-			if(read_table(blue_lineCheck)) {
-				set_pathFound(true);
-			}
-			if(read_table(red_lineCheck)) {
-				set_impasseFound(true);
-			}
+			set_led(1,1);
 		}
-		//invert the bool and reinitialize
 		send_to_computer = !send_to_computer;
 		for(int i = 0; i < DETECT_NUM; i++) {
 			red_lineCheck[i] = 0;
@@ -180,8 +179,8 @@ bool read_table(bool table[]) {
 }
 
 void process_image_start(void){
-	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
-	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
+	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO+1, ProcessImage, NULL);
+	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO+1, CaptureImage, NULL);
 }
 
 bool get_pathFound(void) {
