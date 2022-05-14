@@ -31,6 +31,11 @@ static THD_FUNCTION(ControlMovement, arg) {
 
 	while(!get_end_of_path()){
 		time = chVTGetSystemTime();
+		//once a red or blue line has been detected, the corresponding bool value must stay true until the action has been completed at
+		//the wall, where the line may not be detectable anymore
+		if(!get_end_of_path()) {set_end_of_path(get_pathFound());}
+		if(!get_turn_around()) {set_turn_around(get_impasseFound());}
+
 
 		init_path(get_max_norm_index());
 		//100Hz
