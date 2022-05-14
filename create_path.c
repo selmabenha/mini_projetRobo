@@ -29,10 +29,16 @@ static THD_FUNCTION(ControlMovement, arg) {
 
 	systime_t time;
 
-	while(!get_pathFound()) {
+	while(!get_end_of_path()){
 		time = chVTGetSystemTime();
-		waitDetectStart();
+
 		init_path(get_max_norm_index());
+		//100Hz
+		chThdSleepUntilWindowed(time, time + MS2ST(10));
+
+		//defines the end of the program once the countdown runs to the end
+		set_end_of_path(time_path());
+
 	}
 }
 
