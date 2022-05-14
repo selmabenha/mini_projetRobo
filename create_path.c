@@ -21,6 +21,19 @@
 #include <motors_pro.h>
 #include <arm_math.h>
 
+#define FREQ_RIGHT	 	12.81	//200Hz
+#define FREQ_LEFT	  	38.43	//600Hz
+#define FREQ_LEFT_L			(FREQ_LEFT-3)
+#define FREQ_LEFT_H			(FREQ_LEFT+3)
+#define FREQ_RIGHT_L		(FREQ_RIGHT-3)
+#define FREQ_RIGHT_H		(FREQ_RIGHT+3)
+#define GAME_OVER_TIME		15000	//15 seconds
+#define WARN_TIME			100
+
+static bool end_of_path = 0;
+static bool turn_around = 0;
+static uint8_t game_over = 0;
+
 static THD_WORKING_AREA(theControlMovement, 256);
 static THD_FUNCTION(ControlMovement, arg) {
 
