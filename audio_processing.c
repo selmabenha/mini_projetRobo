@@ -4,6 +4,8 @@
 #include <usbcfg.h>
 #include <chprintf.h>
 
+#include <leds.h>
+#include <tof.h>
 #include <create_path.h>
 #include <motors.h>
 #include <audio/microphone.h>
@@ -12,7 +14,7 @@
 #include <fft.h>
 #include <arm_math.h>
 
-//semaphore
+//semaphores
 static BSEMAPHORE_DECL(sendToComputer_sem, TRUE);
 
 //2 times FFT_SIZE because these arrays contain complex numbers (real + imaginary)
@@ -26,17 +28,11 @@ static float micRight_output[FFT_SIZE];
 static float micFront_output[FFT_SIZE];
 static float micBack_output[FFT_SIZE];
 
-#define MIN_VALUE_THRESHOLD	10000 
+static int16_t max_norm_index;
 
+#define MIN_VALUE_THRESHOLD	10000 
 #define MIN_FREQ		12	//we don't analyze before this index to not use resources for nothing , 200Hz
 #define MAX_FREQ		55 //we don't analyze after this index to not use resources for nothing, 858Hz
-
-#define FREQ_LEFT_L			(FREQ_LEFT-3)
-#define FREQ_LEFT_H			(FREQ_LEFT+3)
-#define FREQ_RIGHT_L		(FREQ_RIGHT-3)
-#define FREQ_RIGHT_H		(FREQ_RIGHT+3)
-
-static int16_t max_norm_index;
 
 static THD_WORKING_AREA(theControlAudio, 256);
 static THD_FUNCTION(ControlAudio, arg) {
@@ -59,19 +55,23 @@ static THD_FUNCTION(ControlAudio, arg) {
     }
 }
 
+//begins audio control thread
+void control_audio_start(void) {
+	chThdCreateStatic(theControlAudio, sizeof(theControlAudio), NORMALPRIO, ControlAudio, NULL);
+}
+
 /*
-*	Simple function used to detect the highest value in a buffer
-*	and to execute a motor command depending on it
+*	Simple function used to detect the highest value in a buffer, a static variable used to control the motors
 */
 void sound_remote(float* data){
 	float max_norm = MIN_VALUE_THRESHOLD;
-	int16_t max_norm_index = -1; 
+	set_max_norm_index(-1);
 
 	//search for the highest peak
 	for(uint16_t i = MIN_FREQ ; i <= MAX_FREQ ; i++){
 		if(data[i] > max_norm){
 			max_norm = data[i];
-			max_norm_index = i;
+			set_max_norm_index(i);
 		}
 	}
 
@@ -80,7 +80,7 @@ void sound_remote(float* data){
 /*
 *	Callback called when the demodulation of the four microphones is done.
 *	We get 160 samples per mic every 10ms (16kHz)
-*	
+*
 *	params :
 *	int16_t *data			Buffer containing 4 times 160 samples. the samples are sorted by micro
 *							so we have [micRight1, micLeft1, micBack1, micFront1, micRight2, etc...]
@@ -95,7 +95,6 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	*	1024 samples, then we compute the FFTs.
 	*
 	*/
-	waitDetectStart();
 	static uint16_t nb_samples = 0;
 	static uint8_t mustSend = 0;
 
@@ -126,7 +125,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		/*	FFT proccessing
 		*
 		*	This FFT function stores the results in the input buffer given.
-		*	This is an "In Place" function. 
+		*	This is an "In Place" function.
 		*/
 
 		doFFT_optimized(FFT_SIZE, micRight_cmplx_input);
@@ -160,39 +159,11 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	}
 }
 
+
 void wait_send_to_computer(void){
 	chBSemWait(&sendToComputer_sem);
 }
 
-float* get_audio_buffer_ptr(BUFFER_NAME_t name){
-	if(name == LEFT_CMPLX_INPUT){
-		return micLeft_cmplx_input;
-	}
-	else if (name == RIGHT_CMPLX_INPUT){
-		return micRight_cmplx_input;
-	}
-	else if (name == FRONT_CMPLX_INPUT){
-		return micFront_cmplx_input;
-	}
-	else if (name == BACK_CMPLX_INPUT){
-		return micBack_cmplx_input;
-	}
-	else if (name == LEFT_OUTPUT){
-		return micLeft_output;
-	}
-	else if (name == RIGHT_OUTPUT){
-		return micRight_output;
-	}
-	else if (name == FRONT_OUTPUT){
-		return micFront_output;
-	}
-	else if (name == BACK_OUTPUT){
-		return micBack_output;
-	}
-	else{
-		return NULL;
-	}
-}
 
 int16_t get_max_norm_index(void) {
 	return max_norm_index;
@@ -200,3 +171,4 @@ int16_t get_max_norm_index(void) {
 void set_max_norm_index(int16_t index) {
 	max_norm_index = index;
 }
+
