@@ -4,7 +4,6 @@
  *  Created on: Apr 28, 2022
  *      Author: mehdiamor
  */
-
 #define stopDistance 	70
 
 #include "ch.h"
@@ -26,10 +25,11 @@ static BSEMAPHORE_DECL(startDetect_sem, TRUE);
 static THD_WORKING_AREA(theTimeOfFlight, 256);
 static THD_FUNCTION(TimeOfFlight, arg) {
 
-    chRegSetThreadName(__FUNCTION__);
+    chRegSetThreadName(_FUNCTION_);
     (void)arg;
 
     systime_t time;
+
 
     while(1){
         time = chVTGetSystemTime();
