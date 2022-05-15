@@ -93,8 +93,14 @@ void process_path(int16_t index) {
 	//is a line found?
 	else if(get_pathFound()) {
 		motors_spin();
+		playMelody(MARIO_FLAG, 0, NULL);
+		waitMelodyHasFinished();
+		set_led(1,1);
 	} else if(get_impasseFound()) {
 		motors_u_turn();
+		playMelody(WALKING, 0, NULL);
+		waitMelodyHasFinished();
+		set_led(3,1);
 	}
 }
 
